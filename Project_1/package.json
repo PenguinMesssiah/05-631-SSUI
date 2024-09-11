@@ -1,0 +1,17 @@
+{
+  "name": "SSUI_Project_1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc ./src/p1.ts",
+    "init-tsc": "tsc --init"
+  },
+  "keywords": [],
+  "author": "Will Scott",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.5.4"
+  }
+}
