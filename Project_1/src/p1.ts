@@ -384,13 +384,15 @@ class FittsTrialRecord {
 
     toString() : string {
         // Excel friendly (CSV) format...
-        return `${twoPlaces(this.startTime)}, ${twoPlaces(this.endTime)}, ` +
-            `${twoPlaces(this.dist)}, ${twoPlaces(this.targetDiam)}`;
+        /*
+        return 'Trail '+ `${this.increaseCount(count)}` + '| Start Time: ' + `${twoPlaces(this.startTime)}, End Time: ${twoPlaces(this.endTime)}, ` +
+            'Distance: ' + `${twoPlaces(this.dist)}, of target diameter ${twoPlaces(this.targetDiam)}`;
 
+        */
         // more human readable format...
-        // return `[start:${twoPlaces(this.startTime)}, end:${twoPlaces(this.endTime)}, ` +
-        //         `dist:${twoPlaces(this.dist)}, w:${twoPlaces(this.targetDiam)}] ` + 
-        //         `dur=${twoPlaces(this.duration)}msec ID=${twoPlaces(this.indexOfDiff)}`;
+        return `[start:${twoPlaces(this.startTime)}, end:${twoPlaces(this.endTime)}, ` +
+                `dist:${twoPlaces(this.dist)}, w:${twoPlaces(this.targetDiam)}] ` + 
+                `dur=${twoPlaces(this.duration)}msec ID=${twoPlaces(this.indexOfDiff)}`;
     }
 }
 
@@ -542,7 +544,8 @@ class FittsTestUI extends UIClass {
                 this.theBackground.msg1 = "Fitt's Law Test Complete!"
                 this.theBackground.msg2 = "Please Refresh the Page to Restart"
                 this.theBackground.msg3 = ""
-        
+
+                this.theReticle.visible = false;
                 // produce a dump of our data records on the console
                 this.presentData();
             break;
@@ -627,8 +630,8 @@ class FittsTestUI extends UIClass {
     presentData() {
         console.log("Data dump...");
         for (let i = 0; i < this.trialData.length; i++) {
-            // console.log("" + i + ":" + this.trialData[i].toString());
-            console.log(this.trialData[i].toString());
+            console.log("Trail " + i + ":" + this.trialData[i].toString());
+            //console.log(this.trialData[i].toString());
         }
     }
 }
