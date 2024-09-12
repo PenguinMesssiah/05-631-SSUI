@@ -885,7 +885,7 @@ class BackgroundDisplay extends ScreenObject{
     override draw(ctx : CanvasRenderingContext2D) : void {
         if (!this.visible) return;
 
-        //Clear Old Items
+        //Clear Old Items: Bad practice =(
         this.parentUI.context.reset()
 
         // Establish font and get measurements
