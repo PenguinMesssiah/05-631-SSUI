@@ -117,8 +117,10 @@ export class TopObject extends DrawnObjectBase {
                 // ourselves...
                 // clip to our bounds
                 //=== YOUR CODE HERE ===
+                this.applyClip(this.canvasContext, this.x, this.y, this.w, this.h);
                 // within our bounds clip to just the damaged region
-                //=== YOUR CODE HERE ===
+                //=== YOUR CODE HERE ===                
+                this.applyClip(this.canvasContext, this._damageRectX, this._damageRectY, this._damageRectW, this._damageRectH);
                 // after this we will no longer be damaged, so reset our damage tracking
                 // rectangle to be our whole bounds
                 this._damageRectX = this._damageRectY = 0;
@@ -126,6 +128,10 @@ export class TopObject extends DrawnObjectBase {
                 this._damageRectH = this.h;
                 // do the actual drawing from here down the tree
                 //=== YOUR CODE HERE ===
+                this._drawSelfOnly(this.canvasContext);
+                this._children.forEach(child_element => {
+                    child_element.draw(this.canvasContext);
+                });
             }
             catch (err) {
                 // catch any exception thrown and echo the message, but then 
@@ -155,6 +161,11 @@ export class TopObject extends DrawnObjectBase {
     // damage instead of passing it up the tree (since there is no up  from here).
     damageArea(xv, yv, wv, hv) {
         //=== YOUR CODE HERE ===
+        this._damageRectX = xv;
+        this._damageRectY = yv;
+        this._damageRectW = wv;
+        this._damageRectH = wv;
+        this._damaged = true;
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  
     // Special routine to declare that damage has occured due to asynchronous

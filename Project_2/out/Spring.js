@@ -23,10 +23,16 @@ export class Spring extends DrawnObjectBase {
     get w() { return super.w; }
     set w(v) {
         //=== YOUR CODE HERE ===
+        this._wConfig = SizeConfig.elastic(v);
+        super.w = this.wConfig.nat | this.wConfig.min | this.wConfig.max;
+        super.damageArea(this.x, this.y, this.w, this.h);
     }
     get h() { return super.h; }
     set h(v) {
         //=== YOUR CODE HERE ===
+        this._hConfig = SizeConfig.elastic(v);
+        super.h = this.hConfig.nat | this.hConfig.min | this.hConfig.max;
+        super.damageArea(this.x, this.y, this.w, this.h);
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Override configuration setters to enforce elastic with zero natural size

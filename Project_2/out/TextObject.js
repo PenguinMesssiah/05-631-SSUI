@@ -25,16 +25,20 @@ export class TextObject extends DrawnObjectBase {
     get text() { return this._text; }
     set text(v) {
         //=== YOUR CODE HERE ===
+        this._text = v;
     }
     get font() { return this._font; }
     set font(v) {
         //=== YOUR CODE HERE ===
+        this.font = v;
     }
     get padding() { return this._padding; }
     set padding(v) {
         if (typeof v === 'number')
             v = { w: v, h: v };
         //=== YOUR CODE HERE ===
+        this.w = v.w;
+        this.y = v.h;
     }
     get renderType() { return this._renderType; }
     set rederType(v) { this._renderType = v; }
@@ -46,6 +50,9 @@ export class TextObject extends DrawnObjectBase {
     // Recalculate the size of this object based on the size of the text
     _recalcSize(ctx) {
         //=== YOUR CODE HERE ===
+        let text_size = this._measureText(this.text, this.font, ctx);
+        this.w = text_size.w;
+        this.h = text_size.h;
         // set the size configuration to be fixed at that size
         this.wConfig = SizeConfig.fixed(this.w);
         this.hConfig = SizeConfig.fixed(this.h);
@@ -69,6 +76,7 @@ export class TextObject extends DrawnObjectBase {
                 clr = this.color.toString();
             }
             //=== YOUR CODE HERE ===
+            this.color = clr;
         }
         finally {
             // restore the drawing context to the state it was given to us in

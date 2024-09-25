@@ -28,11 +28,15 @@ export class FilledObject extends DrawnObjectBase {
     public override get w() {return super.w;}  
     public override set w(v : number) {
         //=== YOUR CODE HERE ===
+        this.w = v;
+        this.damageArea(this.x, this.y, v, this.h);
     }
 
     public override get h() {return super.h;}
     public override set h(v : number) {
         //=== YOUR CODE HERE ===
+        this.h = v;
+        this.damageArea(this.x, this.y, this.w, v)
     }
 
 
@@ -73,6 +77,8 @@ export class FilledObject extends DrawnObjectBase {
         }
         
         //=== YOUR CODE HERE ===
+        ctx.fill()
+        ctx.stroke()
     }
 
     

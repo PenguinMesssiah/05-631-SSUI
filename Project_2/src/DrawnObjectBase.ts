@@ -75,7 +75,7 @@ export class DrawnObjectBase {
    //-------------------------------------------------------------------
 
     public constructor(  
-        x : number = 0,      // x position in parent coordinate system 
+        x: number = 0,      // x position in parent coordinate system 
         y: number = 0,       // y position in parent coordinate system 
         w: number = 42,      // initial width
         h: number = 13,      // initial height
@@ -108,11 +108,12 @@ export class DrawnObjectBase {
     public get x() : number {return this._x;}  
     public set x(v : number) {
         if (v !== this.x) {
-
-             // don't forget to declare damage whenever something changes
-             // that could affect the display
-
+            
             //=== YOUR CODE HERE ===
+            // that could affect the display
+            // don't forget to declare damage whenever something changes
+            this._x = v;
+            this.damageArea(v, this._y, this._w, this._h);
         }
     }    
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -122,6 +123,8 @@ export class DrawnObjectBase {
     public get y() : number {return this._y;}
     public set y(v : number) {
         //=== YOUR CODE HERE ===
+        this._y = v;
+        this.damageArea(this._x, v, this._w, this._h);
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -139,7 +142,9 @@ export class DrawnObjectBase {
     protected _w : number = 42;
     public get w() : number {return this._w;}
     public set w(v : number) {
-            //=== YOUR CODE HERE ===
+        //=== YOUR CODE HERE ===
+        this._w = v;
+        this.damageArea(this._x, this._y, v, this._h)
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -149,6 +154,8 @@ export class DrawnObjectBase {
     public get wConfig() : SizeConfigLiteral {return this._wConfig;}
     public set wConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
+        this._wConfig = v;
+        this.damageArea(this._x, this._y, this._w, this._h);
     }
         
     public get naturalW() : number {return this._wConfig.nat;}
@@ -174,6 +181,8 @@ export class DrawnObjectBase {
     public get h() : number {return this._h;}
     public set h(v : number) {
         //=== YOUR CODE HERE ===
+        this._h = v;
+        this.damageArea(v, this._y, this._w, v);
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -183,6 +192,8 @@ export class DrawnObjectBase {
     public get hConfig() : SizeConfigLiteral {return this._hConfig;}
     public set hConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
+        this._hConfig = v;
+        this.damageArea(this._x, this._y, this._w, this._h);
     }
 
     public get naturalH() : number {return this._hConfig.nat;}
@@ -216,6 +227,8 @@ export class DrawnObjectBase {
     public get visible() : boolean {return this._visible;}
     public set visible(v : boolean) {
             //=== YOUR CODE HERE ===
+            this._visible = v;
+            this.damageAll();
     }
 
     //-------------------------------------------------------------------
@@ -441,6 +454,10 @@ export class DrawnObjectBase {
                      clipx : number, clipy : number, clipw : number, cliph : number) 
     {
         //=== YOUR CODE HERE ===
+        ctx.beginPath()
+        ctx.rect(clipx, clipy, clipw, cliph);
+        ctx.closePath()
+        ctx.clip()
     }
 
     // Utility routine to create a new rectangular path at our bounding box.
@@ -504,8 +521,13 @@ export class DrawnObjectBase {
     protected _startChildDraw(childIndx : number, ctx: DrawContext) {
         // save the state of the context object on its internal stack
         ctx.save();
-
+        
         //=== YOUR CODE HERE ===
+        let active_child = this._children[childIndx];
+        ctx.translate(active_child.x, active_child.y)
+        
+        //this.applyClip(ctx, active_child.x, active_child.y, active_child.w, active_child.h)
+        this.applyClip(ctx, 0, 0, active_child.w, active_child.h)
     }
 
     
@@ -633,6 +655,27 @@ export class DrawnObjectBase {
     // our parent.
     public damageArea(xv: number, yv : number, wv : number, hv : number) : void {
         //=== YOUR CODE HERE ===
+        let v_point_one: PointLiteral = { //Top Left Point
+            x: xv - wv, 
+            y: yv - hv } 
+        let v_point_two: PointLiteral = { //Bottom Right Point
+            x: xv + wv, 
+            y: yv + hv } 
+
+        let reject_test_one: number = (Number(this.x-this.w > v_point_one.x)) <<           //Left of Left
+                                        (Number((this.x+this.w) > v_point_one.x)) <<       //Right of Right
+                                            (Number(this.y-this.h > v_point_one.y)) <<     //Top of Top
+                                                (Number((this.y+this.h) > v_point_one.y)); //Bottom of Bottom
+
+        let reject_test_two: number = (Number(this.x-this.w > v_point_two.x)) <<           //Left of Left
+                                        (Number((this.x+this.w) > v_point_two.x)) <<       //Right of Right
+                                            (Number(this.y-this.h > v_point_two.y)) <<     //Top of Top
+                                                (Number((this.y+this.h) > v_point_two.y)); //Bottom of Bottom
+
+        if((reject_test_one && reject_test_two) === 0) {
+            //Report Damage Somehow, call draw function?
+            this.parent?._damageFromChild(this, xv, yv, wv, hv);
+        }
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -656,7 +699,13 @@ export class DrawnObjectBase {
                                xInChildCoords: number, yInChildCoords: number, 
                                wv : number, hv: number) : void 
     {
-            //=== YOUR CODE HERE ===
+        //=== YOUR CODE HERE ===
+        //Translate Back to this object's local coordinate system
+        let ctx = child._findDrawContext()
+        ctx?.resetTransform()
+        ctx?.translate(this.x,this.y)
+                               
+        this._parent?._damageFromChild(child, xInChildCoords, yInChildCoords, wv, hv);
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
