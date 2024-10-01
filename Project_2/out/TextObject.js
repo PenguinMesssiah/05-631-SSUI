@@ -77,6 +77,8 @@ export class TextObject extends DrawnObjectBase {
             }
             //=== YOUR CODE HERE ===
             this.color = clr;
+            //ctx.textBaseline
+            ctx.fillText(this.text, this.x, this.y, this.wConfig.max);
         }
         finally {
             // restore the drawing context to the state it was given to us in

@@ -70,6 +70,10 @@ export class TopObject extends DrawnObjectBase {
     // For this object we clear the canvas behind the children that we draw
     _drawSelfOnly(ctx) {
         //=== YOUR CODE HERE ===
+        ctx.clearRect(this.x, this.y, this.w, this.h);
+        ctx.rect(this.x, this.y, this.w, this.h);
+        ctx.stroke();
+        ctx.fill();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Override the _findTop() method so to returns this object as the top we have been
@@ -117,7 +121,7 @@ export class TopObject extends DrawnObjectBase {
                 // ourselves...
                 // clip to our bounds
                 //=== YOUR CODE HERE ===
-                this.applyClip(this.canvasContext, this.x, this.y, this.w, this.h);
+                this.applyClip(this.canvasContext, this._x, this._y, this._w, this._h);
                 // within our bounds clip to just the damaged region
                 //=== YOUR CODE HERE ===                
                 this.applyClip(this.canvasContext, this._damageRectX, this._damageRectY, this._damageRectW, this._damageRectH);
@@ -129,9 +133,14 @@ export class TopObject extends DrawnObjectBase {
                 // do the actual drawing from here down the tree
                 //=== YOUR CODE HERE ===
                 this._drawSelfOnly(this.canvasContext);
-                this._children.forEach(child_element => {
-                    child_element.draw(this.canvasContext);
-                });
+                this._drawChildren(this.canvasContext);
+                /*
+                if(this.children.length !== 0) {
+                    this._children.forEach(child_element => {
+                        child_element.draw(this.canvasContext)
+                    });
+                }
+                */
             }
             catch (err) {
                 // catch any exception thrown and echo the message, but then 
@@ -161,11 +170,33 @@ export class TopObject extends DrawnObjectBase {
     // damage instead of passing it up the tree (since there is no up  from here).
     damageArea(xv, yv, wv, hv) {
         //=== YOUR CODE HERE ===
+        if (this._damaged) {
+            if (wv > this._wConfig.max) {
+                this._damageRectW = this._wConfig.max;
+            }
+            else if (wv < this._wConfig.min) {
+                this._damageRectW = this._wConfig.min;
+            }
+            else {
+                this._damageRectW = this._wConfig.nat;
+            }
+            if (hv > this._hConfig.max) {
+                this._damageRectH = this._hConfig.max;
+            }
+            else if (hv < this._hConfig.min) {
+                this._damageRectH = this._hConfig.min;
+            }
+            else {
+                this._damageRectH = this._hConfig.nat;
+            }
+        }
+        else {
+            this._damageRectW = wv;
+            this._damageRectH = hv;
+            this._damaged = true;
+        }
         this._damageRectX = xv;
         this._damageRectY = yv;
-        this._damageRectW = wv;
-        this._damageRectH = wv;
-        this._damaged = true;
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  
     // Special routine to declare that damage has occured due to asynchronous

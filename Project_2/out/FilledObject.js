@@ -24,14 +24,32 @@ export class FilledObject extends DrawnObjectBase {
     get w() { return super.w; }
     set w(v) {
         //=== YOUR CODE HERE ===
-        this.w = v;
-        this.damageArea(this.x, this.y, v, this.h);
+        if (v > this._wConfig.max) {
+            this._w = this._wConfig.max;
+        }
+        else if (v < this._wConfig.min) {
+            this._w = this._wConfig.min;
+        }
+        else {
+            this._w = v;
+            this._wConfig.nat = v;
+        }
+        this.damageAll();
     }
     get h() { return super.h; }
     set h(v) {
         //=== YOUR CODE HERE ===
-        this.h = v;
-        this.damageArea(this.x, this.y, this.w, v);
+        if (v > this._hConfig.max) {
+            this._h = this._hConfig.max;
+        }
+        else if (v < this._hConfig.min) {
+            this._h = this._hConfig.min;
+        }
+        else {
+            this._h = v;
+            this._hConfig.nat = v;
+        }
+        this.damageAll();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Override configuration setters to enforce fixed size
@@ -56,8 +74,8 @@ export class FilledObject extends DrawnObjectBase {
             ctx.fillStyle = this.color.toString();
         }
         //=== YOUR CODE HERE ===
+        ctx.rect(this.x, this.y, this.w, this.h);
         ctx.fill();
-        ctx.stroke();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Produce a human readable "tag" string for this object -- a short string which 

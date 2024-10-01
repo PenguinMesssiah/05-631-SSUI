@@ -77,7 +77,17 @@ export class Row extends Group {
     //
     // Our width is set to the width determined by stacking our children horizontally.
     _doLocalSizing() {
-        //=== YOUR CODE HERE ===max};
+        //=== YOUR CODE HERE ===
+        let sum_values = { min: 0, nat: 0, max: 0 };
+        let max_values = { min: 0, nat: 0, max: 0 };
+        this._children.forEach((child_element) => {
+            //Calculate Sum of Each Min/Nat/Max
+            sum_values = SizeConfig.add(sum_values, child_element.wConfig);
+            //Calculate Max Width
+            max_values = SizeConfig.maximum(max_values, child_element.hConfig);
+        });
+        this.wConfig = sum_values;
+        this.hConfig = max_values;
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // This method adjusts the width of the children to do horizontal springs and struts 
@@ -135,6 +145,15 @@ export class Row extends Group {
         let availCompr = 0;
         let numSprings = 0;
         //=== YOUR CODE HERE ===
+        this._children.forEach(child_element => {
+            if (!(child_element instanceof Spring)) {
+                natSum += child_element.wConfig.nat;
+                availCompr += (child_element.wConfig.nat - child_element.wConfig.min);
+            }
+            else {
+                numSprings++;
+            }
+        });
         return [natSum, availCompr, numSprings];
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -144,6 +163,12 @@ export class Row extends Group {
     // the space at the right of the row as a fallback strategy).
     _expandChildSprings(excess, numSprings) {
         //=== YOUR CODE HERE ===
+        let excessPerSpring = excess / numSprings;
+        this._children.forEach((child_element) => {
+            if ((child_element instanceof Spring)) {
+                child_element.h = child_element.h + excessPerSpring;
+            }
+        });
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Contract our child objects to make up the given amount of shortfall.  Springs
@@ -160,6 +185,8 @@ export class Row extends Group {
         // from the natural height of that child, to get the assigned height.
         for (let child of this.children) {
             //=== YOUR CODE HERE ===
+            let child_availCompr = (child.naturalW - child.minW) / availCompr;
+            child.naturalW = child.naturalW - (child_availCompr / shortfall);
         }
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -198,6 +225,19 @@ export class Row extends Group {
         }
         // apply our justification setting for the vertical
         //=== YOUR CODE HERE ===
+        this.children.forEach((child_element) => {
+            switch (this.hJustification) {
+                case "top":
+                    child_element.y = this.y;
+                    break;
+                case "center":
+                    child_element.y = this.y + this.h / 2;
+                    break;
+                case "bottom":
+                    child_element.y = this.y + this.h;
+                    break;
+            }
+        });
     }
 }
 //===================================================================

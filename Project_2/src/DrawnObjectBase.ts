@@ -113,7 +113,7 @@ export class DrawnObjectBase {
             // that could affect the display
             // don't forget to declare damage whenever something changes
             this._x = v;
-            this.damageArea(v, this._y, this._w, this._h);
+            this.damageAll()
         }
     }    
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -124,7 +124,7 @@ export class DrawnObjectBase {
     public set y(v : number) {
         //=== YOUR CODE HERE ===
         this._y = v;
-        this.damageArea(this._x, v, this._w, this._h);
+        this.damageAll()
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -144,7 +144,7 @@ export class DrawnObjectBase {
     public set w(v : number) {
         //=== YOUR CODE HERE ===
         this._w = v;
-        this.damageArea(this._x, this._y, v, this._h)
+        this.damageAll()
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -155,7 +155,7 @@ export class DrawnObjectBase {
     public set wConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
         this._wConfig = v;
-        this.damageArea(this._x, this._y, this._w, this._h);
+        this.damageAll()
     }
         
     public get naturalW() : number {return this._wConfig.nat;}
@@ -182,7 +182,7 @@ export class DrawnObjectBase {
     public set h(v : number) {
         //=== YOUR CODE HERE ===
         this._h = v;
-        this.damageArea(v, this._y, this._w, v);
+        this.damageAll()
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -193,7 +193,7 @@ export class DrawnObjectBase {
     public set hConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
         this._hConfig = v;
-        this.damageArea(this._x, this._y, this._w, this._h);
+        this.damageAll()
     }
 
     public get naturalH() : number {return this._hConfig.nat;}
@@ -456,6 +456,7 @@ export class DrawnObjectBase {
         //=== YOUR CODE HERE ===
         ctx.beginPath()
         ctx.rect(clipx, clipy, clipw, cliph);
+        ctx.stroke();
         ctx.closePath()
         ctx.clip()
     }
@@ -528,6 +529,8 @@ export class DrawnObjectBase {
         
         //this.applyClip(ctx, active_child.x, active_child.y, active_child.w, active_child.h)
         this.applyClip(ctx, 0, 0, active_child.w, active_child.h)
+
+        ctx.restore()
     }
 
     
@@ -655,6 +658,10 @@ export class DrawnObjectBase {
     // our parent.
     public damageArea(xv: number, yv : number, wv : number, hv : number) : void {
         //=== YOUR CODE HERE ===
+        if(this.parent) {
+            this.parent?._damageFromChild(this, xv, yv, wv, hv);
+        }
+        /*
         let v_point_one: PointLiteral = { //Top Left Point
             x: xv - wv, 
             y: yv - hv } 
@@ -671,11 +678,7 @@ export class DrawnObjectBase {
                                         (Number((this.x+this.w) > v_point_two.x)) <<       //Right of Right
                                             (Number(this.y-this.h > v_point_two.y)) <<     //Top of Top
                                                 (Number((this.y+this.h) > v_point_two.y)); //Bottom of Bottom
-
-        if((reject_test_one && reject_test_two) === 0) {
-            //Report Damage Somehow, call draw function?
-            this.parent?._damageFromChild(this, xv, yv, wv, hv);
-        }
+        */
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -702,10 +705,11 @@ export class DrawnObjectBase {
         //=== YOUR CODE HERE ===
         //Translate Back to this object's local coordinate system
         let ctx = child._findDrawContext()
-        ctx?.resetTransform()
-        ctx?.translate(this.x,this.y)
-                               
-        this._parent?._damageFromChild(child, xInChildCoords, yInChildCoords, wv, hv);
+        if(ctx) {
+            ctx.resetTransform()
+            ctx.translate(this.x,this.y)
+        }
+        this.damageArea(xInChildCoords+this.x, yInChildCoords+this.y, wv, hv);                    
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -78,6 +78,16 @@ export class Column extends Group {
     // Our height is set to the height determined by stacking our children vertically.
     _doLocalSizing() {
         //=== YOUR CODE HERE ===
+        let sum_values = { min: 0, nat: 0, max: 0 };
+        let max_values = { min: 0, nat: 0, max: 0 };
+        this._children.forEach((child_element) => {
+            //Calculate Sum of Each Min/Nat/Max
+            sum_values = SizeConfig.add(sum_values, child_element.hConfig);
+            //Calculate Max Width
+            max_values = SizeConfig.maximum(max_values, child_element.wConfig);
+        });
+        this.hConfig = sum_values;
+        this.wConfig = max_values;
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // This method adjusts the height of the children to do vertical springs and struts 
@@ -135,6 +145,15 @@ export class Column extends Group {
         let availCompr = 0;
         let numSprings = 0;
         //=== YOUR CODE HERE ===
+        this._children.forEach(child_element => {
+            if (!(child_element instanceof Spring)) {
+                natSum += child_element.hConfig.nat;
+                availCompr += (child_element.hConfig.nat - child_element.hConfig.min);
+            }
+            else {
+                numSprings++;
+            }
+        });
         return [natSum, availCompr, numSprings];
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -144,6 +163,12 @@ export class Column extends Group {
     // the space at the bottom of the column as a fallback strategy).
     _expandChildSprings(excess, numSprings) {
         //=== YOUR CODE HERE ===
+        let excessPerSpring = excess / numSprings;
+        this._children.forEach((child_element) => {
+            if ((child_element instanceof Spring)) {
+                child_element.h = child_element.h + excessPerSpring;
+            }
+        });
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Contract our child objects to make up the given amount of shortfall.  Springs
@@ -160,6 +185,8 @@ export class Column extends Group {
         // from the natural height of that child, to get the assigned height.
         for (let child of this.children) {
             //=== YOUR CODE HERE ===
+            let child_availCompr = (child.naturalH - child.minH) / availCompr;
+            child.naturalH = child.naturalH - (child_availCompr / shortfall);
         }
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -198,6 +225,19 @@ export class Column extends Group {
         }
         // apply our justification setting for the horizontal
         //=== YOUR CODE HERE ===
+        this.children.forEach((child_element) => {
+            switch (this.wJustification) {
+                case "right":
+                    child_element.x = this.x;
+                    break;
+                case "center":
+                    child_element.x = this.x + this.w / 2;
+                    break;
+                case "left":
+                    child_element.x = this.x + this.w;
+                    break;
+            }
+        });
     }
 }
 //===================================================================

@@ -75,13 +75,21 @@ export class IconObject extends DrawnObjectBase {
     get resizesImage() { return this._resizesImage; }
     set resizesImage(v) {
         //=== YOUR CODE HERE ===
+        this._resizesImage = v;
     }
     //-------------------------------------------------------------------
     // Methods
     //-------------------------------------------------------------------
     // If our size is determined by the image, resize us to match (otherwise do nothing).
     _resize() {
+        var _a;
         //=== YOUR CODE HERE ===
+        if (!this.resizesImage) {
+            if (((_a = this._image) === null || _a === void 0 ? void 0 : _a.canvasImage)) {
+                this.h = this._image.canvasImage.height;
+                this.w = this._image.canvasImage.width;
+            }
+        }
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Function that is called when our loading is complete

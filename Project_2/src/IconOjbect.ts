@@ -11,7 +11,7 @@ import { DrawableImage } from "./DrawableImage.js";
 //===================================================================
 export class IconObject extends DrawnObjectBase {
     public constructor(  
-        x : number = 0,          // x position in parent coordinate system 
+        x: number = 0,          // x position in parent coordinate system 
         y: number = 0,           // y position in parent coordinate system 
         w: number = 42,          // initial width (but ignored if reszImg is false)
         h: number = 13,          // initial height (but ignored if reszImg is false)
@@ -87,6 +87,7 @@ export class IconObject extends DrawnObjectBase {
     public get resizesImage() {return this._resizesImage;}
     public set resizesImage(v : boolean) {
         //=== YOUR CODE HERE ===
+        this._resizesImage = v;
     }
 
     //-------------------------------------------------------------------
@@ -96,6 +97,12 @@ export class IconObject extends DrawnObjectBase {
     // If our size is determined by the image, resize us to match (otherwise do nothing).
     protected _resize() {
         //=== YOUR CODE HERE ===
+        if(!this.resizesImage) {
+            if((this._image?.canvasImage))  {
+                this.h = this._image.canvasImage.height
+                this.w = this._image.canvasImage.width
+            }
+        }
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

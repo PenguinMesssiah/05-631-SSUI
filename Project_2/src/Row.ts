@@ -1,5 +1,5 @@
 
-import { SizeConfig } from "./SizeConfig.js";
+import { SizeConfig, SizeConfigLiteral } from "./SizeConfig.js";
 import { DrawContext, HJust } from "./Util.js";
 import { Group } from "./Group.js";
 import { Spring } from "./Spring.js";
@@ -91,7 +91,17 @@ export class Row extends Group {
     //
     // Our width is set to the width determined by stacking our children horizontally.
     protected override _doLocalSizing() : void {
-        //=== YOUR CODE HERE ===max};
+        //=== YOUR CODE HERE ===
+        let sum_values: SizeConfigLiteral = { min: 0, nat: 0, max: 0};
+        let max_values: SizeConfigLiteral = { min: 0, nat: 0, max: 0};
+        this._children.forEach((child_element) => {
+            //Calculate Sum of Each Min/Nat/Max
+            sum_values = SizeConfig.add(sum_values, child_element.wConfig)
+            //Calculate Max Width
+            max_values = SizeConfig.maximum(max_values,child_element.hConfig)
+        })
+        this.wConfig = sum_values
+        this.hConfig = max_values
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -156,6 +166,14 @@ export class Row extends Group {
         let numSprings = 0; 
 
         //=== YOUR CODE HERE ===
+        this._children.forEach(child_element => {
+            if(!(child_element instanceof Spring)) {
+                natSum     += child_element.wConfig.nat;
+                availCompr += (child_element.wConfig.nat - child_element.wConfig.min)
+            } else {
+                numSprings++;
+            }
+        })
 
         return [natSum, availCompr, numSprings];
     }
@@ -168,6 +186,12 @@ export class Row extends Group {
     // the space at the right of the row as a fallback strategy).
     protected _expandChildSprings(excess : number, numSprings : number) : void {
         //=== YOUR CODE HERE ===
+        let excessPerSpring = excess / numSprings;
+        this._children.forEach((child_element) => {
+            if ((child_element instanceof Spring)){
+                child_element.h = child_element.h + excessPerSpring
+            }
+        })
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -188,6 +212,8 @@ export class Row extends Group {
         // from the natural height of that child, to get the assigned height.
         for (let child of this.children) {
             //=== YOUR CODE HERE ===
+            let child_availCompr: number = (child.naturalW - child.minW)/availCompr
+            child.naturalW = child.naturalW - (child_availCompr/shortfall);
         }
 }
 
@@ -230,8 +256,20 @@ export class Row extends Group {
         }
 
         // apply our justification setting for the vertical
-
         //=== YOUR CODE HERE ===
+        this.children.forEach((child_element) => {
+            switch(this.hJustification) {
+                case "top":
+                    child_element.y = this.y
+                    break;
+                case "center":
+                    child_element.y = this.y + this.h/2;
+                    break;
+                case "bottom":
+                    child_element.y = this.y + this.h;
+                    break;
+            }
+        })
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

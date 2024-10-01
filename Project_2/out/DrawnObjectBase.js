@@ -139,14 +139,14 @@ export class DrawnObjectBase {
             // that could affect the display
             // don't forget to declare damage whenever something changes
             this._x = v;
-            this.damageArea(v, this._y, this._w, this._h);
+            this.damageAll();
         }
     }
     get y() { return this._y; }
     set y(v) {
         //=== YOUR CODE HERE ===
         this._y = v;
-        this.damageArea(this._x, v, this._w, this._h);
+        this.damageAll();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // x,y position of this object in parent coordinates 
@@ -160,13 +160,13 @@ export class DrawnObjectBase {
     set w(v) {
         //=== YOUR CODE HERE ===
         this._w = v;
-        this.damageArea(this._x, this._y, v, this._h);
+        this.damageAll();
     }
     get wConfig() { return this._wConfig; }
     set wConfig(v) {
         //=== YOUR CODE HERE ===
         this._wConfig = v;
-        this.damageArea(this._x, this._y, this._w, this._h);
+        this.damageAll();
     }
     get naturalW() { return this._wConfig.nat; }
     set naturalW(v) {
@@ -186,13 +186,13 @@ export class DrawnObjectBase {
     set h(v) {
         //=== YOUR CODE HERE ===
         this._h = v;
-        this.damageArea(v, this._y, this._w, v);
+        this.damageAll();
     }
     get hConfig() { return this._hConfig; }
     set hConfig(v) {
         //=== YOUR CODE HERE ===
         this._hConfig = v;
-        this.damageArea(this._x, this._y, this._w, this._h);
+        this.damageAll();
     }
     get naturalH() { return this._hConfig.nat; }
     set naturalH(v) {
@@ -399,6 +399,7 @@ export class DrawnObjectBase {
         //=== YOUR CODE HERE ===
         ctx.beginPath();
         ctx.rect(clipx, clipy, clipw, cliph);
+        ctx.stroke();
         ctx.closePath();
         ctx.clip();
     }
@@ -463,6 +464,7 @@ export class DrawnObjectBase {
         ctx.translate(active_child.x, active_child.y);
         //this.applyClip(ctx, active_child.x, active_child.y, active_child.w, active_child.h)
         this.applyClip(ctx, 0, 0, active_child.w, active_child.h);
+        ctx.restore();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Internal method to restore the given drawing context after drawing the 
@@ -577,26 +579,27 @@ export class DrawnObjectBase {
     damageArea(xv, yv, wv, hv) {
         var _a;
         //=== YOUR CODE HERE ===
-        let v_point_one = {
-            x: xv - wv,
-            y: yv - hv
-        };
-        let v_point_two = {
-            x: xv + wv,
-            y: yv + hv
-        };
-        let reject_test_one = (Number(this.x - this.w > v_point_one.x)) << //Left of Left
-            (Number((this.x + this.w) > v_point_one.x)) << //Right of Right
-            (Number(this.y - this.h > v_point_one.y)) << //Top of Top
-            (Number((this.y + this.h) > v_point_one.y)); //Bottom of Bottom
-        let reject_test_two = (Number(this.x - this.w > v_point_two.x)) << //Left of Left
-            (Number((this.x + this.w) > v_point_two.x)) << //Right of Right
-            (Number(this.y - this.h > v_point_two.y)) << //Top of Top
-            (Number((this.y + this.h) > v_point_two.y)); //Bottom of Bottom
-        if ((reject_test_one && reject_test_two) === 0) {
-            //Report Damage Somehow, call draw function?
+        if (this.parent) {
             (_a = this.parent) === null || _a === void 0 ? void 0 : _a._damageFromChild(this, xv, yv, wv, hv);
         }
+        /*
+        let v_point_one: PointLiteral = { //Top Left Point
+            x: xv - wv,
+            y: yv - hv }
+        let v_point_two: PointLiteral = { //Bottom Right Point
+            x: xv + wv,
+            y: yv + hv }
+
+        let reject_test_one: number = (Number(this.x-this.w > v_point_one.x)) <<           //Left of Left
+                                        (Number((this.x+this.w) > v_point_one.x)) <<       //Right of Right
+                                            (Number(this.y-this.h > v_point_one.y)) <<     //Top of Top
+                                                (Number((this.y+this.h) > v_point_one.y)); //Bottom of Bottom
+
+        let reject_test_two: number = (Number(this.x-this.w > v_point_two.x)) <<           //Left of Left
+                                        (Number((this.x+this.w) > v_point_two.x)) <<       //Right of Right
+                                            (Number(this.y-this.h > v_point_two.y)) <<     //Top of Top
+                                                (Number((this.y+this.h) > v_point_two.y)); //Bottom of Bottom
+        */
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Declare that the entire bounding box has been damaged.  This is the typical 
@@ -613,13 +616,14 @@ export class DrawnObjectBase {
     // damage may be, since all drawing at or under this location in the tree is 
     // limited to our bounds by clipping.
     _damageFromChild(child, xInChildCoords, yInChildCoords, wv, hv) {
-        var _a;
         //=== YOUR CODE HERE ===
         //Translate Back to this object's local coordinate system
         let ctx = child._findDrawContext();
-        ctx === null || ctx === void 0 ? void 0 : ctx.resetTransform();
-        ctx === null || ctx === void 0 ? void 0 : ctx.translate(this.x, this.y);
-        (_a = this._parent) === null || _a === void 0 ? void 0 : _a._damageFromChild(child, xInChildCoords, yInChildCoords, wv, hv);
+        if (ctx) {
+            ctx.resetTransform();
+            ctx.translate(this.x, this.y);
+        }
+        this.damageArea(xInChildCoords + this.x, yInChildCoords + this.y, wv, hv);
     }
     get debugID() { return this._debugID; }
     static _genDebugID() { return DrawnObjectBase._nextDebugID++; }
