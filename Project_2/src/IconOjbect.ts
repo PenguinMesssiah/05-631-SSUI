@@ -132,8 +132,11 @@ export class IconObject extends DrawnObjectBase {
 
         if (this.resizesImage) {
             //=== YOUR CODE HERE ===
+            ctx.drawImage(this.image.canvasImage, 0, 0, this.w, this.h)
         } else {
             //=== YOUR CODE HERE ===
+            ctx.drawImage(this.image.canvasImage, 0, 0, 
+                this.image.canvasImage.naturalWidth, this.image.canvasImage.naturalHeight)        
         }
     }
 

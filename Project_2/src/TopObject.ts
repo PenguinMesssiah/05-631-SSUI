@@ -1,4 +1,4 @@
-import { DrawContext } from "./Util.js";
+import { DrawContext, PointLiteral } from "./Util.js";
 import { Err } from "./Err.js";
 import { DrawnObjectBase } from "./DrawnObjectBase.js";
 
@@ -101,7 +101,6 @@ export class TopObject extends DrawnObjectBase {
         ctx.clearRect(this.x, this.y, this.w, this.h)
         ctx.rect(this.x, this.y, this.w, this.h)
         ctx.stroke()
-        ctx.fill()
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -160,7 +159,7 @@ export class TopObject extends DrawnObjectBase {
 
                 // clip to our bounds
                 //=== YOUR CODE HERE ===
-                this.applyClip(this.canvasContext, this._x, this._y, this._w, this._h);
+                this.applyClip(this.canvasContext, this.x, this.y, this.w, this.h);
 
                 // within our bounds clip to just the damaged region
                 //=== YOUR CODE HERE ===                
@@ -176,14 +175,6 @@ export class TopObject extends DrawnObjectBase {
                 //=== YOUR CODE HERE ===
                 this._drawSelfOnly(this.canvasContext)
                 this._drawChildren(this.canvasContext)
-                /*
-                if(this.children.length !== 0) {
-                    this._children.forEach(child_element => {
-                        child_element.draw(this.canvasContext)
-                    });
-                }
-                */
-
             } catch(err) {
                 // catch any exception thrown and echo the message, but then 
                 // use Err to decide how we continue (by default we print a 
@@ -216,28 +207,18 @@ export class TopObject extends DrawnObjectBase {
     public override damageArea(xv: number, yv: number, wv: number, hv: number): void {
         //=== YOUR CODE HERE ===
         if(this._damaged) {
-            if(wv > this._wConfig.max) 
-                { this._damageRectW = this._wConfig.max }
-            else if (wv < this._wConfig.min) 
-                { this._damageRectW = this._wConfig.min }
-            else 
-                { this._damageRectW = this._wConfig.nat }
-
-            if(hv > this._hConfig.max) 
-                { this._damageRectH = this._hConfig.max }
-            else if (hv < this._hConfig.min) 
-                { this._damageRectH = this._hConfig.min }
-            else 
-                { this._damageRectH = this._hConfig.nat }
-        }
-        else {
+            this._damageRectX = Math.min(this.x,xv);
+            this._damageRectY = Math.min(this.y,yv);
+            this._damageRectW = Math.max(this.w,wv);
+            this._damageRectH = Math.max(this.h,hv);
+        } else {
+            this._damageRectX = xv;
+            this._damageRectY = yv;
             this._damageRectW = wv;
             this._damageRectH = hv;
-            this._damaged = true;
         }
 
-        this._damageRectX = xv;
-        this._damageRectY = yv;  
+        this._damaged = true
     }
     
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  

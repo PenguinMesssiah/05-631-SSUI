@@ -24,13 +24,15 @@ export class Strut extends DrawnObjectBase {
     set w(v) {
         //=== YOUR CODE HERE ===
         this._w = v;
-        this.damageAll();
+        this._wConfig = SizeConfig.fixed(v);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     get h() { return super.h; }
     set h(v) {
         //=== YOUR CODE HERE ===
         this._h = v;
-        this.damageAll();
+        this._hConfig = SizeConfig.fixed(v);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Override configuration setters to enforce fixed size

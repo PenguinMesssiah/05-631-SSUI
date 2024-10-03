@@ -41,7 +41,7 @@ export class TextObject extends DrawnObjectBase {
         this.y = v.h;
     }
     get renderType() { return this._renderType; }
-    set rederType(v) { this._renderType = v; }
+    set renderType(v) { this._renderType = v; }
     get color() { return this._color; }
     set color(v) { this._color = v; }
     //-------------------------------------------------------------------
@@ -76,9 +76,18 @@ export class TextObject extends DrawnObjectBase {
                 clr = this.color.toString();
             }
             //=== YOUR CODE HERE ===
-            this.color = clr;
-            //ctx.textBaseline
-            ctx.fillText(this.text, this.x, this.y, this.wConfig.max);
+            let text_size = this._measureText(this.text, this.font, ctx);
+            ctx.font = this.font;
+            ctx.direction = "ltr";
+            ctx.textAlign = "left";
+            if (this.renderType === "fill") {
+                ctx.fillStyle = clr;
+                ctx.fillText(this.text, this.padding.w, text_size.baseln + this.padding.h);
+            }
+            else if (this.renderType === 'stroke') {
+                ctx.strokeStyle = clr;
+                ctx.strokeText(this.text, this.padding.w, text_size.baseln + this.padding.h);
+            }
         }
         finally {
             // restore the drawing context to the state it was given to us in

@@ -29,19 +29,15 @@ export class Spring extends DrawnObjectBase {
     public override get w() {return super.w;}  
     public override set w(v : number) {
         //=== YOUR CODE HERE ===
-        this._wConfig = SizeConfig.elastic(v)
-        //this.w = this.wConfig.nat | this.wConfig.min | this.wConfig.max;
-        this._w = this.wConfig.nat
-        super.damageAll()
+        this._w = SizeConfig.withinConfig(v, this.wConfig)
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
 
     public override get h() {return super.h;}
     public override set h(v : number) {
         //=== YOUR CODE HERE ===
-        this._hConfig = SizeConfig.elastic(v)
-        //this.h = this.hConfig.nat | this.hConfig.min | this.hConfig.max;
-        this._h = this.hConfig.nat
-        super.damageAll()
+        this._h = SizeConfig.withinConfig(v,this.hConfig)
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
 
 

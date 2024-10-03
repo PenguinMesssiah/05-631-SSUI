@@ -159,14 +159,14 @@ export class DrawnObjectBase {
     get w() { return this._w; }
     set w(v) {
         //=== YOUR CODE HERE ===
-        this._w = v;
-        this.damageAll();
+        this._w = SizeConfig.withinConfig(v, this._wConfig);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     get wConfig() { return this._wConfig; }
     set wConfig(v) {
         //=== YOUR CODE HERE ===
-        this._wConfig = v;
-        this.damageAll();
+        this._wConfig = SizeConfig.fitWithinConfig(v, this.wConfig);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     get naturalW() { return this._wConfig.nat; }
     set naturalW(v) {
@@ -185,14 +185,14 @@ export class DrawnObjectBase {
     get h() { return this._h; }
     set h(v) {
         //=== YOUR CODE HERE ===
-        this._h = v;
-        this.damageAll();
+        this._h = SizeConfig.withinConfig(v, this._hConfig);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     get hConfig() { return this._hConfig; }
     set hConfig(v) {
         //=== YOUR CODE HERE ===
-        this._hConfig = v;
-        this.damageAll();
+        this._hConfig = SizeConfig.fitWithinConfig(v, this.hConfig);
+        this.damageArea(this.x, this.y, this.w, this.h);
     }
     get naturalH() { return this._hConfig.nat; }
     set naturalH(v) {
@@ -460,11 +460,10 @@ export class DrawnObjectBase {
         // save the state of the context object on its internal stack
         ctx.save();
         //=== YOUR CODE HERE ===
+        //Find Active Child And Apply transform
         let active_child = this._children[childIndx];
         ctx.translate(active_child.x, active_child.y);
-        //this.applyClip(ctx, active_child.x, active_child.y, active_child.w, active_child.h)
         this.applyClip(ctx, 0, 0, active_child.w, active_child.h);
-        ctx.restore();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Internal method to restore the given drawing context after drawing the 
@@ -582,24 +581,6 @@ export class DrawnObjectBase {
         if (this.parent) {
             (_a = this.parent) === null || _a === void 0 ? void 0 : _a._damageFromChild(this, xv, yv, wv, hv);
         }
-        /*
-        let v_point_one: PointLiteral = { //Top Left Point
-            x: xv - wv,
-            y: yv - hv }
-        let v_point_two: PointLiteral = { //Bottom Right Point
-            x: xv + wv,
-            y: yv + hv }
-
-        let reject_test_one: number = (Number(this.x-this.w > v_point_one.x)) <<           //Left of Left
-                                        (Number((this.x+this.w) > v_point_one.x)) <<       //Right of Right
-                                            (Number(this.y-this.h > v_point_one.y)) <<     //Top of Top
-                                                (Number((this.y+this.h) > v_point_one.y)); //Bottom of Bottom
-
-        let reject_test_two: number = (Number(this.x-this.w > v_point_two.x)) <<           //Left of Left
-                                        (Number((this.x+this.w) > v_point_two.x)) <<       //Right of Right
-                                            (Number(this.y-this.h > v_point_two.y)) <<     //Top of Top
-                                                (Number((this.y+this.h) > v_point_two.y)); //Bottom of Bottom
-        */
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Declare that the entire bounding box has been damaged.  This is the typical 
@@ -617,13 +598,9 @@ export class DrawnObjectBase {
     // limited to our bounds by clipping.
     _damageFromChild(child, xInChildCoords, yInChildCoords, wv, hv) {
         //=== YOUR CODE HERE ===
-        //Translate Back to this object's local coordinate system
-        let ctx = child._findDrawContext();
-        if (ctx) {
-            ctx.resetTransform();
-            ctx.translate(this.x, this.y);
-        }
-        this.damageArea(xInChildCoords + this.x, yInChildCoords + this.y, wv, hv);
+        let translateX = xInChildCoords + child.x;
+        let translateY = yInChildCoords + child.y;
+        this.damageArea(translateX, translateY, wv, hv);
     }
     get debugID() { return this._debugID; }
     static _genDebugID() { return DrawnObjectBase._nextDebugID++; }

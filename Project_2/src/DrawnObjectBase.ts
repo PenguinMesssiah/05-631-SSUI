@@ -143,8 +143,8 @@ export class DrawnObjectBase {
     public get w() : number {return this._w;}
     public set w(v : number) {
         //=== YOUR CODE HERE ===
-        this._w = v;
-        this.damageAll()
+        this._w = SizeConfig.withinConfig(v,this._wConfig)
+        this.damageArea(this.x, this.y, this.w, this.h)
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -154,8 +154,8 @@ export class DrawnObjectBase {
     public get wConfig() : SizeConfigLiteral {return this._wConfig;}
     public set wConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
-        this._wConfig = v;
-        this.damageAll()
+        this._wConfig = SizeConfig.fitWithinConfig(v, this.wConfig);
+        this.damageArea(this.x, this.y, this.w, this.h)
     }
         
     public get naturalW() : number {return this._wConfig.nat;}
@@ -181,8 +181,8 @@ export class DrawnObjectBase {
     public get h() : number {return this._h;}
     public set h(v : number) {
         //=== YOUR CODE HERE ===
-        this._h = v;
-        this.damageAll()
+        this._h = SizeConfig.withinConfig(v, this._hConfig);
+        this.damageArea(this.x, this.y, this.w, this.h)
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -192,8 +192,8 @@ export class DrawnObjectBase {
     public get hConfig() : SizeConfigLiteral {return this._hConfig;}
     public set hConfig(v : SizeConfigLiteral) {
         //=== YOUR CODE HERE ===
-        this._hConfig = v;
-        this.damageAll()
+        this._hConfig = SizeConfig.fitWithinConfig(v, this.hConfig);
+        this.damageArea(this.x, this.y, this.w, this.h)
     }
 
     public get naturalH() : number {return this._hConfig.nat;}
@@ -457,8 +457,8 @@ export class DrawnObjectBase {
         ctx.beginPath()
         ctx.rect(clipx, clipy, clipw, cliph);
         ctx.stroke();
-        ctx.closePath()
-        ctx.clip()
+        ctx.closePath();
+        ctx.clip();
     }
 
     // Utility routine to create a new rectangular path at our bounding box.
@@ -524,13 +524,12 @@ export class DrawnObjectBase {
         ctx.save();
         
         //=== YOUR CODE HERE ===
+        //Find Active Child And Apply transform
         let active_child = this._children[childIndx];
+
         ctx.translate(active_child.x, active_child.y)
         
-        //this.applyClip(ctx, active_child.x, active_child.y, active_child.w, active_child.h)
         this.applyClip(ctx, 0, 0, active_child.w, active_child.h)
-
-        ctx.restore()
     }
 
     
@@ -661,24 +660,6 @@ export class DrawnObjectBase {
         if(this.parent) {
             this.parent?._damageFromChild(this, xv, yv, wv, hv);
         }
-        /*
-        let v_point_one: PointLiteral = { //Top Left Point
-            x: xv - wv, 
-            y: yv - hv } 
-        let v_point_two: PointLiteral = { //Bottom Right Point
-            x: xv + wv, 
-            y: yv + hv } 
-
-        let reject_test_one: number = (Number(this.x-this.w > v_point_one.x)) <<           //Left of Left
-                                        (Number((this.x+this.w) > v_point_one.x)) <<       //Right of Right
-                                            (Number(this.y-this.h > v_point_one.y)) <<     //Top of Top
-                                                (Number((this.y+this.h) > v_point_one.y)); //Bottom of Bottom
-
-        let reject_test_two: number = (Number(this.x-this.w > v_point_two.x)) <<           //Left of Left
-                                        (Number((this.x+this.w) > v_point_two.x)) <<       //Right of Right
-                                            (Number(this.y-this.h > v_point_two.y)) <<     //Top of Top
-                                                (Number((this.y+this.h) > v_point_two.y)); //Bottom of Bottom
-        */
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -703,13 +684,9 @@ export class DrawnObjectBase {
                                wv : number, hv: number) : void 
     {
         //=== YOUR CODE HERE ===
-        //Translate Back to this object's local coordinate system
-        let ctx = child._findDrawContext()
-        if(ctx) {
-            ctx.resetTransform()
-            ctx.translate(this.x,this.y)
-        }
-        this.damageArea(xInChildCoords+this.x, yInChildCoords+this.y, wv, hv);                    
+        let translateX: number = xInChildCoords + child.x;
+        let translateY: number = yInChildCoords + child.y;
+        this.damageArea(translateX, translateY, wv, hv);                    
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

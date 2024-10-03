@@ -1,4 +1,4 @@
-import { DrawContext, SizeLiteral, RenderOp } from "./Util.js";
+import { DrawContext, SizeLiteral, RenderOp, TextMeasure } from "./Util.js";
 import { DrawnObjectBase } from "./DrawnObjectBase.js";
 import { SizeConfig } from "./SizeConfig.js";
 
@@ -38,7 +38,6 @@ export class TextObject extends DrawnObjectBase {
         //=== YOUR CODE HERE ===
         this._text = v;
     }
-
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     // Default font that we use for objects of this class.  We use "em" sizing here
@@ -90,7 +89,7 @@ export class TextObject extends DrawnObjectBase {
     // Drawing type (filled or stroked)
     protected _renderType : RenderOp;  
     public get renderType() : RenderOp {return this._renderType;}
-    public set rederType(v : RenderOp) {this._renderType = v;}
+    public set renderType(v : RenderOp) {this._renderType = v;}
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -138,10 +137,17 @@ export class TextObject extends DrawnObjectBase {
             }
             
             //=== YOUR CODE HERE ===
-            this.color = clr;
-            //ctx.textBaseline
-            ctx.fillText(this.text,this.x,this.y,this.wConfig.max)
-
+            let text_size     = this._measureText(this.text, this.font, ctx);
+            ctx.font          = this.font
+            ctx.direction     = "ltr"
+            ctx.textAlign     = "left"
+            if(this.renderType === "fill"){
+                ctx.fillStyle = clr;
+                ctx.fillText(this.text,this.padding.w,text_size.baseln+this.padding.h)
+            } else if (this.renderType === 'stroke') {
+                ctx.strokeStyle = clr;
+                ctx.strokeText(this.text,this.padding.w,text_size.baseln+this.padding.h)
+            }
         }   finally {
             // restore the drawing context to the state it was given to us in
             ctx.restore();
