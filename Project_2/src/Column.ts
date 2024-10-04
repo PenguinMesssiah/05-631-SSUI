@@ -3,6 +3,7 @@ import { SizeConfig, SizeConfigLiteral } from "./SizeConfig.js";
 import { DrawContext, WJust } from "./Util.js";
 import { Group } from "./Group.js";
 import { Spring } from "./Spring.js";
+import { Strut } from "./Strut.js";
 
 //===================================================================
 // A column layout class designed to work with springs and struts layout.
@@ -189,7 +190,7 @@ export class Column extends Group {
         let excessPerSpring = excess / numSprings;
         this._children.forEach((child_element) => {
             if ((child_element instanceof Spring)){
-                child_element.h = child_element.h + excessPerSpring
+                child_element.h = excessPerSpring
             }
         })
     }
@@ -212,8 +213,8 @@ export class Column extends Group {
         // from the natural height of that child, to get the assigned height.
         for (let child of this.children) {
             //=== YOUR CODE HERE ===
-            let child_availCompr: number = (child.naturalH - child.minH)/availCompr
-            child.naturalH = child.naturalH - (child_availCompr/shortfall);
+            let child_availCompr_h: number = (child.h - child.minH)/availCompr
+            child.h = child.h - (child_availCompr_h/shortfall);
         }
     }
 
@@ -257,17 +258,17 @@ export class Column extends Group {
 
         // apply our justification setting for the horizontal
         //=== YOUR CODE HERE ===
+        //Iterate through each child, and use object's & parent's width for placement
         this.children.forEach((child_element) => {
             switch(this.wJustification) {
                 case "right":
-                    child_element.x = this.x
+                    child_element.x = this.w-child_element.w;
                     break;
                 case "center":
-                    child_element.x = this.x + this.w/2;
+                    child_element.x = this.w/2-child_element.w/2;
                     break;
                 case "left":
-                    child_element.x = this.x + this.w;
-                    break;
+                    child_element.x = 0;
             }
         })
     }

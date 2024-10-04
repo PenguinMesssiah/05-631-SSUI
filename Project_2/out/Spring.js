@@ -23,13 +23,19 @@ export class Spring extends DrawnObjectBase {
     get w() { return super.w; }
     set w(v) {
         //=== YOUR CODE HERE ===
-        this._w = SizeConfig.withinConfig(v, this.wConfig);
+        v = SizeConfig.withinConfig(v, this.wConfig);
+        if (v !== this._w) {
+            this._w = v;
+        }
         this.damageArea(this.x, this.y, this.w, this.h);
     }
     get h() { return super.h; }
     set h(v) {
         //=== YOUR CODE HERE ===
-        this._h = SizeConfig.withinConfig(v, this.hConfig);
+        v = SizeConfig.withinConfig(v, this.hConfig);
+        if (v !== this._h) {
+            this._h = v;
+        }
         this.damageArea(this.x, this.y, this.w, this.h);
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

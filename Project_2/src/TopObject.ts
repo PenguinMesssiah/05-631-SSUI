@@ -173,6 +173,7 @@ export class TopObject extends DrawnObjectBase {
 
                 // do the actual drawing from here down the tree
                 //=== YOUR CODE HERE ===
+                //Draw Top and Children
                 this._drawSelfOnly(this.canvasContext)
                 this._drawChildren(this.canvasContext)
             } catch(err) {
@@ -207,6 +208,8 @@ export class TopObject extends DrawnObjectBase {
     public override damageArea(xv: number, yv: number, wv: number, hv: number): void {
         //=== YOUR CODE HERE ===
         if(this._damaged) {
+            //If we are already damaged, find correct max/min
+            //(shout out to the slack post)
             this._damageRectX = Math.min(this.x,xv);
             this._damageRectY = Math.min(this.y,yv);
             this._damageRectW = Math.max(this.w,wv);

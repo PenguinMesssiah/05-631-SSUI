@@ -144,6 +144,7 @@ export class DrawnObjectBase {
     public set w(v : number) {
         //=== YOUR CODE HERE ===
         this._w = SizeConfig.withinConfig(v,this._wConfig)
+        //this._w = v;
         this.damageArea(this.x, this.y, this.w, this.h)
     }
 
@@ -455,6 +456,7 @@ export class DrawnObjectBase {
     {
         //=== YOUR CODE HERE ===
         ctx.beginPath()
+        //create bounding box & clip
         ctx.rect(clipx, clipy, clipw, cliph);
         ctx.stroke();
         ctx.closePath();
@@ -684,6 +686,7 @@ export class DrawnObjectBase {
                                wv : number, hv: number) : void 
     {
         //=== YOUR CODE HERE ===
+        //Translate components to local coordinates
         let translateX: number = xInChildCoords + child.x;
         let translateY: number = yInChildCoords + child.y;
         this.damageArea(translateX, translateY, wv, hv);                    

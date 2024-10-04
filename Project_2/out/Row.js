@@ -166,7 +166,7 @@ export class Row extends Group {
         let excessPerSpring = excess / numSprings;
         this._children.forEach((child_element) => {
             if ((child_element instanceof Spring)) {
-                child_element.h = child_element.h + excessPerSpring;
+                child_element.w = excessPerSpring;
             }
         });
     }
@@ -185,8 +185,8 @@ export class Row extends Group {
         // from the natural height of that child, to get the assigned height.
         for (let child of this.children) {
             //=== YOUR CODE HERE ===
-            let child_availCompr = (child.naturalW - child.minW) / availCompr;
-            child.naturalW = child.naturalW - (child_availCompr / shortfall);
+            let child_availCompr = (child.w - child.minW) / availCompr;
+            child.w = child.w - (child_availCompr / shortfall);
         }
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -225,16 +225,17 @@ export class Row extends Group {
         }
         // apply our justification setting for the vertical
         //=== YOUR CODE HERE ===
+        //Iterate through each child, and use object's & parent's height for placement
         this.children.forEach((child_element) => {
             switch (this.hJustification) {
                 case "top":
-                    child_element.y = this.y;
+                    child_element.y = 0;
                     break;
                 case "center":
-                    child_element.y = this.y + this.h / 2;
+                    child_element.y = this.h / 2 - child_element.h / 2;
                     break;
                 case "bottom":
-                    child_element.y = this.y + this.h;
+                    child_element.y = this.h - child_element.h;
                     break;
             }
         });

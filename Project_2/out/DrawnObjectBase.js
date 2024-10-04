@@ -160,6 +160,7 @@ export class DrawnObjectBase {
     set w(v) {
         //=== YOUR CODE HERE ===
         this._w = SizeConfig.withinConfig(v, this._wConfig);
+        //this._w = v;
         this.damageArea(this.x, this.y, this.w, this.h);
     }
     get wConfig() { return this._wConfig; }
@@ -186,6 +187,7 @@ export class DrawnObjectBase {
     set h(v) {
         //=== YOUR CODE HERE ===
         this._h = SizeConfig.withinConfig(v, this._hConfig);
+        //this._h = v;
         this.damageArea(this.x, this.y, this.w, this.h);
     }
     get hConfig() { return this._hConfig; }
