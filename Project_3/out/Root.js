@@ -1,3 +1,4 @@
+import { Err } from "./Err.js";
 //===================================================================
 // Class for a root object which manages the connection with with the underlying 
 // HTML canvas and performs other global tasks (like invoking redraws) for the system.
@@ -57,7 +58,7 @@ export class Root {
     //-------------------------------------------------------------------
     // Perform of redraw across all our child object using the previously established
     // drawing context object for the HTML canvas object we are associated with.
-    // This begins work by clearing the entire canvas.  The for each child object this 
+    // This begins work by clearing the entire canvas.  Then for each child object this 
     // saves the state of the drawing context, puts it in the child coordinate system,
     // draws the child, and then restors the context.
     _redraw() {
@@ -65,6 +66,17 @@ export class Root {
         this._batchingDamage = true;
         try {
             // **** YOUR CODE HERE ****
+            const ctx = this.canvasContext;
+            //ctx.clearRect(0,0, this.owningCanvas.width, this.owningCanvas.height);
+            this._children.forEach((child) => {
+                ctx.save();
+                ctx.translate(child.x, child.y);
+                child.draw(this.canvasContext);
+                ctx.restore();
+            });
+        }
+        catch (exception) {
+            Err.warning("Exception captured and suppressed during redraw.  Pressing ahead...");
             // currently, for ease of debugging, we let exceptions propogate out from this 
             // redraw (and typically all the out of our code).  this will basically shut 
             // down the whole system and preclude further action.  if recovery from 
@@ -72,9 +84,7 @@ export class Root {
             // seen by end users, but less so for debugging/testings), a catch should be 
             // placed here (e.g., like  the one commented out below) to swallow (but 
             // hopefully report) exceptions that are propogated out to this point.
-            // } catch(exception) {
-            //     Err.warning(
-            //         "Exception captured and suppressed during redraw.  Pressing ahead...");
+            //
         }
         finally {
             this._batchingDamage = saveBatching;

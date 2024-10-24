@@ -50,10 +50,18 @@ export class FSMInteractor {
     get x() { return this._x; }
     set x(v) {
         // **** YOUR CODE HERE ****
+        if (!(this._x === v)) {
+            this._x = v;
+            this.damage();
+        }
     }
     get y() { return this._y; }
     set y(v) {
         // **** YOUR CODE HERE ****
+        if (!(this._y === v)) {
+            this._y = v;
+            this.damage();
+        }
     }
     // Position treated as a single value
     get position() {
@@ -70,6 +78,11 @@ export class FSMInteractor {
     get parent() { return this._parent; }
     set parent(v) {
         // **** YOUR CODE HERE ****
+        if (!(this._parent === v)) {
+            this.damage();
+            this._parent = v;
+            this.damage();
+        }
     }
     get fsm() { return this._fsm; }
     //-------------------------------------------------------------------
@@ -82,7 +95,9 @@ export class FSMInteractor {
     // regions, etc.  This method passes the damage notification to its hosting Root
     // object which coordinates eventual redraw by calling this object's draw() method.
     damage() {
+        var _a;
         // **** YOUR CODE HERE ****
+        (_a = this.parent) === null || _a === void 0 ? void 0 : _a.damage();
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Draw the display for this object using the given drawing context object.  If the
@@ -94,6 +109,12 @@ export class FSMInteractor {
         if (!this.fsm)
             return;
         // **** YOUR CODE HERE ****
+        this.fsm.regions.forEach((region) => {
+            ctx.save();
+            ctx.translate(region.x, region.y);
+            region.draw(ctx);
+            ctx.restore();
+        });
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Perform a "pick" operation, to determine the list of regions in our controlling

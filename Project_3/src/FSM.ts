@@ -167,7 +167,7 @@ export class FSM {
     public damage() : void {
             
         // **** YOUR CODE HERE ****
-
+        this.parent?.damage()
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
