@@ -182,13 +182,40 @@ export class FSM {
         // walk over all the transitions in all the states to get those bound
             
         // **** YOUR CODE HERE ****
-
         // start state is the first one
-            
-        // **** YOUR CODE HERE ****
+        this._startState?.transitions.forEach((startState_transitions) => {
+            //Binding All Transitions _target Objects for Start State
+            startState_transitions.bindTarget(this._states)
 
+            //Binding All Transitions _region Object for Start State
+            startState_transitions.onEvent.bindRegion(this._regions)
+
+            //Binding All Actions in each of startState's transitions, map to their onRegion Object
+            startState_transitions.actions.forEach((temp_action) => {
+                temp_action.bindRegion(this._regions)
+            })
+        })
+
+        //all regions, states, parent...
+        this._states.forEach((temp_state) => {
+            temp_state.transitions.forEach((temp_transition) => {
+                //Binding All Transitions _target Object for All Transitions
+                temp_transition.bindTarget(this._states)
+
+                //Binding All Transitions _region Object for All Transitions
+                temp_transition.onEvent.bindRegion(this._regions)
+
+                //Binding All Actions in each transition, map to their onRegion Object
+                temp_transition.actions.forEach((temp_action) => {
+                    temp_action.bindRegion(this._regions)
+                })
+            })
+        })  
+        // **** YOUR CODE HERE ****
         // need to link all regions back to this object as their parent
-            
+        this._regions.forEach((temp_region) => {
+            temp_region.parent = this;
+        })
         // **** YOUR CODE HERE ****
 
     }
@@ -200,6 +227,9 @@ export class FSM {
     public reset() {
             
         // **** YOUR CODE HERE ****
+        this._currentState = this._startState;
+        //Do not anticipate any damage but just in case
+        this.damage()
     }
     
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 

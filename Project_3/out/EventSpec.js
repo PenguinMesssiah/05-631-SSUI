@@ -33,6 +33,13 @@ export class EventSpec {
             return;
         }
         // **** YOUR CODE HERE ****
+        //Iterate Across List & Match Object by Name
+        regionList.forEach((region_element) => {
+            if (region_element.name === this._regionName) {
+                this._region = region_element;
+                return;
+            }
+        });
         // we didn't match any region, that's ok for some forms that don't need a region
         if (this.evtType === 'nevermatch')
             return;
@@ -49,8 +56,19 @@ export class EventSpec {
     // our region is undefined and region name is "*", we will match to any region.
     match(evtType, regn) {
         // **** YOUR CODE HERE ****
-        // **** Remove this: just here to get it to compile... ****
-        return false;
+        //Event Type Check
+        if (evtType !== this._evtType)
+            return false;
+        //Region Check
+        if (regn === undefined) {
+            if (this._regionName === '*')
+                return true;
+            else
+                return false;
+        }
+        else {
+            return regn.name === this._regionName;
+        }
     }
     //-------------------------------------------------------------------
     // Debugging Support

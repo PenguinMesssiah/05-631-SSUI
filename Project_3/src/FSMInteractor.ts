@@ -163,6 +163,15 @@ export class FSMInteractor {
         if (!this.fsm) return pickList;
            
         // **** YOUR CODE HERE ****
+        //Iterate Over Regions in FSM
+        let fsm_regionList = this.fsm.regions
+        for(let i = 0; fsm_regionList.length-1; i+=1) {
+            let temp_region = fsm_regionList[i]
+            
+            //Call Pick Operation on Each Region
+            if(temp_region.pick(this.x,this.y))
+                pickList.push(temp_region)
+        }
 
         return pickList;
     }
@@ -172,6 +181,8 @@ export class FSMInteractor {
         
         // **** YOUR CODE HERE ****   
         // You will need some persistent bookkeeping for dispatchRawEvent()
+
+        //PICK UP HERE
 
     // Dispatch the given "raw" event by translating it into a series of higher-level
     // events which are formulated in terms of the regions of our FSM.  "Raw" events 
@@ -197,6 +208,7 @@ export class FSMInteractor {
         if (this.fsm === undefined) return;
 
         // **** YOUR CODE HERE ****
+
     }
 
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

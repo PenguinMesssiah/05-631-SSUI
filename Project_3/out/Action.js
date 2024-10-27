@@ -32,12 +32,37 @@ export class Action {
         if (this._actType === 'none')
             return;
         // **** YOUR CODE HERE ****
+        switch (this._actType) {
+            case "set_image":
+                if (this._onRegion)
+                    this._onRegion.imageLoc = this._param;
+                break;
+            case "clear_image":
+                if (this._onRegion)
+                    this._onRegion.imageLoc = "";
+                break;
+            case "print":
+                console.log("Execute Action: print (param_val) | \n");
+                console.log("parm | ", this._param);
+                break;
+            case "print_event":
+                console.log("Execute Action: print_event | \n");
+                console.log("eventType | ", evtType.toString(), " | on Event Region ", evtReg === null || evtReg === void 0 ? void 0 : evtReg.toString());
+                break;
+        }
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Attempt to find the name listed for this region in the given list of regions
     // (from the whole FSM), assiging the Region object to this._onRegion if found.
     bindRegion(regionList) {
         // **** YOUR CODE HERE ****
+        //Iterate Across List & Match Object by Name
+        regionList.forEach((region_element) => {
+            if (region_element.name === this._onRegionName) {
+                this._onRegion = region_element;
+                return;
+            }
+        });
         // ok to have no matching region for some actions
         if (this.actType === 'none' || this.actType === 'print' ||
             this.actType === 'print_event') {

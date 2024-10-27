@@ -125,6 +125,11 @@ export class Region {
     // coordinates of this object) should be considered "inside" or "over" this region.
     pick(localX, localY) {
         // **** YOUR CODE HERE ****
+        // X-Axis Check: (0 < localX < this._x + this._w)
+        if ((localX >= 0) && (localX <= this._x + this._w))
+            // Y-Axis Check: (0 < localY < this._y + this._h)
+            if ((localY >= 0) && (localY <= this._y + this._h))
+                return true;
         // **** Remove this, it's just here to make this compile as-is
         return false;
     }
