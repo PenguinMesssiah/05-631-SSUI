@@ -43,7 +43,7 @@ export class Transition {
     // event types and their meaning).
     match(evtType, regn) {
         // **** YOUR CODE HERE ****
-        return this._onEvent.match(evtType, regn);
+        return this.onEvent.match(evtType, regn);
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
     // Attempt to look up the name of the target state for this transition and 
@@ -53,12 +53,13 @@ export class Transition {
     bindTarget(stateList) {
         // **** YOUR CODE HERE ****
         //Iterate Across List & Match Object by Name
-        stateList.forEach((state_element) => {
+        for (let i = 0; i <= stateList.length - 1; i += 1) {
+            let state_element = stateList[i];
             if (state_element.name === this._targetName) {
                 this._target = state_element;
                 return;
             }
-        });
+        }
         // no matching state name, so generate an error message
         Err.emit(`State '${this._targetName}' in transition does not match any state.`);
     }

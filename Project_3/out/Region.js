@@ -125,12 +125,20 @@ export class Region {
     // coordinates of this object) should be considered "inside" or "over" this region.
     pick(localX, localY) {
         // **** YOUR CODE HERE ****
-        // X-Axis Check: (0 < localX < this._x + this._w)
-        if ((localX >= 0) && (localX <= this._x + this._w))
-            // Y-Axis Check: (0 < localY < this._y + this._h)
-            if ((localY >= 0) && (localY <= this._y + this._h))
+        // X-Axis Check: (this.x <= localX <= this._x + this._w)
+        if ((localX >= this.x) && (localX <= this.x + this.w)) {
+            // Y-Axis Check: (this.y <= localY <= this._y + this._h)
+            if ((localY >= this.y) && (localY <= this.y + this.h)) {
+                /* Error Checking
+                console.log("name = ", this.name)
+                console.log("(x,y) = ", this.x, ", ", this.y)
+                console.log("(w,h)", this.w, ", ", this.h)
+                console.log("(x+w,y+h)", this.x+this.w, ", ", this.y+this.h)
+                console.log("(localX, localY)", localX, ", ", localY)
+                */
                 return true;
-        // **** Remove this, it's just here to make this compile as-is
+            }
+        }
         return false;
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -142,9 +150,14 @@ export class Region {
     // around the (input) bounds of the region for debugging purposes.
     draw(ctx, showDebugFrame = false) {
         // if we have a valid loaded image, draw it
-        if (this.loaded && !this.loadError && this.image) {
+        if (this.loaded && !this.loadError) {
             // **** YOUR CODE HERE ****
-            ctx.drawImage(this.image, 0, 0);
+            if (this.image) {
+                ctx.clearRect(0, 0, this._w, this._h);
+                ctx.drawImage(this.image, 0, 0);
+            }
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(0, 0, this.w, this.h);
         }
         //draw a frame indicating the (input) bounding box if requested
         if (showDebugFrame) {

@@ -90,7 +90,7 @@ export class Transition {
     public match(evtType : EventType, regn? : Region) : boolean {
            
         // **** YOUR CODE HERE ****
-        return this._onEvent.match(evtType, regn);
+        return this.onEvent.match(evtType, regn);
     }
     
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -103,12 +103,14 @@ export class Transition {
             
         // **** YOUR CODE HERE ****
         //Iterate Across List & Match Object by Name
-        stateList.forEach((state_element) => {
+        for(let i=0;i<=stateList.length-1;i+=1) {
+            let state_element = stateList[i];
+
             if(state_element.name === this._targetName){
                 this._target = state_element
                 return;
             }
-        })
+        }
 
         // no matching state name, so generate an error message
         Err.emit(`State '${this._targetName}' in transition does not match any state.`);

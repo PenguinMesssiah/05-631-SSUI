@@ -82,22 +82,26 @@ export class Action {
     // the event which is causing the action (for use by print_event actions).
     public execute(evtType : EventType, evtReg? : Region) { 
         if (this._actType === 'none') return;
-        
         // **** YOUR CODE HERE ****
         switch(this._actType){
             case "set_image":
+                console.log("evt---\n",">",evtType.toString(),"(",evtReg?.name,")")    
                 if (this._onRegion) this._onRegion.imageLoc = this._param;
                 break;
             case "clear_image":
-                if(this._onRegion) this._onRegion.imageLoc = "";
+            console.log("evt---\n",">",evtType.toString(),"(",evtReg?.name,")")    
+                if(this.onRegion) {
+                    this.onRegion.imageLoc = "";
+                    this.onRegion.damage()
+                }
                 break;
             case "print":
-                console.log("Execute Action: print (param_val) | \n")
-                console.log("parm | ", this._param);
+                console.log("evt---\n",">",evtType.toString(),"(",this.param,")")
+                //console.log("Execute Action: print (param_val) | \n")
+                //console.log("parm | ", this._param);
                 break;
             case "print_event":
-                console.log("Execute Action: print_event | \n")
-                console.log("eventType | ", evtType.toString(), " | on Event Region ", evtReg?.toString())
+                console.log("evt---\n",">",evtType.toString(),"(",evtReg?.name,")")
                 break;
             }
     }
@@ -110,12 +114,14 @@ export class Action {
             
         // **** YOUR CODE HERE ****
         //Iterate Across List & Match Object by Name
-        regionList.forEach((region_element) => {
+        for(let i=0;i<=regionList.length-1;i+=1) {
+            let region_element = regionList[i];
+
             if(region_element.name === this._onRegionName) {
                 this._onRegion = region_element;
                 return;
             }
-        })
+        }
         
         // ok to have no matching region for some actions
         if (this.actType === 'none' || this.actType === 'print' || 

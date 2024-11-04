@@ -23,6 +23,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { FSM } from "./FSM.js";
 import { Err } from "./Err.js";
+import { EventSpec } from "./EventSpec.js";
 //===================================================================
 // Class for an interactive object controlled by a finite state machine (FSM).
 // Objects of this class have a position on the screen (the location of their top-left
@@ -39,13 +40,18 @@ import { Err } from "./Err.js";
 // by the containing HTML canvas object).  See the FSM and Root classes for more details.
 //=================================================================== 
 export class FSMInteractor {
-    constructor(fsm = undefined, x = 0, y = 0, parent) {
+    constructor(fsm = undefined, x = 0, y = 0, parent, oldLocatorListObj) {
         this._fsm = fsm;
         this._x = x;
         this._y = y;
         this._parent = parent;
         if (fsm)
             fsm.parent = this;
+        this._oldLocatorPosObj = [];
+    }
+    get oldLocatorPosObj() { return this._oldLocatorPosObj; }
+    set oldLocatorPosObj(v) {
+        this._oldLocatorPosObj = v;
     }
     get x() { return this._x; }
     set x(v) {
@@ -133,11 +139,14 @@ export class FSMInteractor {
         // **** YOUR CODE HERE ****
         //Iterate Over Regions in FSM
         let fsm_regionList = this.fsm.regions;
-        for (let i = 0; fsm_regionList.length - 1; i += 1) {
+        for (let i = 0; i <= fsm_regionList.length - 1; i += 1) {
             let temp_region = fsm_regionList[i];
             //Call Pick Operation on Each Region
-            if (temp_region.pick(this.x, this.y))
+            //Shit breaking here
+            if (temp_region.pick(localX, localY)) {
+                //console.log("picking ", temp_region.name)
                 pickList.push(temp_region);
+            }
         }
         return pickList;
     }
@@ -167,6 +176,101 @@ export class FSMInteractor {
         if (this.fsm === undefined)
             return;
         // **** YOUR CODE HERE ****
+        let eventList = [];
+        let fsm_regions = this.fsm.regions;
+        //let fsm_curState = this.fsm.currentState;
+        let pickedRegions = this.pick(localX, localY);
+        /* starting raw actions |
+            press, move, release
+        */
+        //Switch Case to Process What Happened
+        switch (what) {
+            case 'move':
+                //Test for exit, enter, move_inside
+                for (let i = 0; i <= pickedRegions.length - 1; i += 1) {
+                    let temp_region = pickedRegions[i];
+                    //Checking Bookeeping List Length, Looking for Prior Entered Regions
+                    if (this.oldLocatorPosObj.length !== 0) {
+                        //If Locator Not in Prior Region List | Generate enter <region>
+                        if (!this.oldLocatorPosObj.includes(temp_region.name)) {
+                            let enterRegionEvt = new EventSpec('enter', temp_region.name);
+                            enterRegionEvt.bindRegion(fsm_regions);
+                            //Book-keeping | Add Region to OldLocatorPosition List
+                            this.oldLocatorPosObj.push(temp_region.name);
+                            eventList.push(enterRegionEvt);
+                        }
+                        //If Mouse in Prior Region List | Generate move_inside <region>
+                        if (this.oldLocatorPosObj.includes(temp_region.name)) {
+                            let moveInsideRegionEvt = new EventSpec('move_inside', temp_region.name);
+                            moveInsideRegionEvt.bindRegion(fsm_regions);
+                            eventList.push(moveInsideRegionEvt);
+                        }
+                    }
+                    else {
+                        //If OldLocatorPosObj is Empty, Simply Generate a enter <region>
+                        let enterRegionEvt = new EventSpec('enter', temp_region.name);
+                        //console.log("binding temp_region name = ",temp_region.name)
+                        enterRegionEvt.bindRegion(fsm_regions);
+                        //Book-keeping | Add Region to OldLocatorPosition List
+                        this.oldLocatorPosObj.push(temp_region.name);
+                        eventList.push(enterRegionEvt);
+                    }
+                }
+                //Check for All Regions NOT Picked by FSM
+                let notPickedRegions = [];
+                this.fsm.regions.forEach((temp_region) => {
+                    if (!pickedRegions.includes(temp_region)) {
+                        //console.log("added to not picked regions ", temp_region.name)
+                        notPickedRegions.push(temp_region);
+                    }
+                });
+                //If Old Region is not Picked, but in Prior Region List | Generate exit <region>
+                if (this.oldLocatorPosObj.length !== 0) {
+                    for (let j = 0; j <= this.oldLocatorPosObj.length - 1; j += 1) {
+                        let temp_region = this.oldLocatorPosObj[j];
+                        for (let i = 0; i <= notPickedRegions.length - 1; i += 1) {
+                            if (notPickedRegions[i].name === temp_region) {
+                                let exitRegionEvt = new EventSpec('exit', temp_region);
+                                exitRegionEvt.bindRegion(fsm_regions);
+                                //Book Keeping, Remove from Prior Region List
+                                let index = this.oldLocatorPosObj.indexOf(temp_region, 0);
+                                if (index > -1) {
+                                    this.oldLocatorPosObj.splice(index, 1);
+                                }
+                                eventList.push(exitRegionEvt);
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'press':
+                //Test for press <region>
+                for (let i = 0; i <= pickedRegions.length - 1; i += 1) {
+                    let temp_region = pickedRegions[i];
+                    let pressRegionEvt = new EventSpec('press', temp_region.name);
+                    pressRegionEvt.bindRegion(fsm_regions);
+                    eventList.push(pressRegionEvt);
+                }
+                break;
+            case 'release':
+                //Test for release <region>
+                for (let i = 0; i <= pickedRegions.length - 1; i += 1) {
+                    let temp_region = pickedRegions[i];
+                    let releaseRegionEvt = new EventSpec('release', temp_region.name);
+                    releaseRegionEvt.bindRegion(fsm_regions);
+                    eventList.push(releaseRegionEvt);
+                }
+                break;
+        }
+        /* final translated actions |
+            exit <region>, enter <region>, press <region>,
+            move_inside <region>, release <region>, and release_none
+        */
+        //Act on All Generate Events
+        eventList.forEach((event) => {
+            if (this.fsm)
+                this.fsm.actOnEvent(event.evtType, event.region);
+        });
     }
     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     // Method to begin an asychnous load of a FSM_json object from a remotely loaded 

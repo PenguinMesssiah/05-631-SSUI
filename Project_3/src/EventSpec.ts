@@ -86,13 +86,15 @@ export class EventSpec {
      
         // **** YOUR CODE HERE ****
         //Iterate Across List & Match Object by Name
-        regionList.forEach((region_element) => {
-            if(region_element.name === this._regionName) {
-                this._region = region_element;
-                return;
-            }
-        });
+        for(let i=0;i<=regionList.length-1;i+=1) {
+           let region_element = regionList[i];
 
+           if(region_element.name === this._regionName) {
+               this._region = region_element;
+               return;
+           }
+        }
+        
         // we didn't match any region, that's ok for some forms that don't need a region
         if (this.evtType === 'nevermatch') return;
         if ((this.evtType === 'release_none' || this.evtType === 'any') && 
@@ -111,17 +113,26 @@ export class EventSpec {
     public match(evtType : EventType, regn? : Region) : boolean {
           
         // **** YOUR CODE HERE ****
+        /*error checking
+        console.log("evtType = ", evtType)
+        console.log("regn = ", regn)
+        console.log("this.evtType = ", this.evtType)
+        console.log("this.regionName = ", this.regionName)
+        */
+       
         //Event Type Check
-        if (evtType !== this._evtType) return false;
+        if(this.evtType !== 'any' && evtType !== this._evtType) {
+            return false;
+        }
 
         //Region Check
-        if (regn === undefined) {
-            if (this._regionName === '*') 
+        if (this.region === undefined) {
+            if (this.regionName === '*') 
                 return true;
             else 
                 return false; 
         } else  {
-            return regn.name === this._regionName;
+            return regn?.name === this._regionName;
         }
     }
     
