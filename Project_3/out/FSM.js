@@ -157,7 +157,6 @@ export class FSM {
         // **** YOUR CODE HERE ****
         //Iterate Across Current Available Transitions | Find Match to Execute
         this.currentState.transitions.forEach((temp_transition) => {
-            //console.log("made it into transitions")
             if (temp_transition.match(evtType, reg)) {
                 //Execute All the Actions associated with the Transition
                 temp_transition.actions.forEach((temp_action) => {

@@ -22,8 +22,29 @@ import { Check } from "./Check.js";
 //===================================================================
 
 // A type for the actions we support, along with correponding strings
-export type ActionType = 'set_image' |  'clear_image' | 'none' | 'print' | 'print_event';
-const actionTypeStrings = ['set_image',  'clear_image', 'none', 'print', 'print_event'];
+export type ActionType = 'set_image' |  'clear_image' | 'none' | 'print' | 'print_event' | 'move_image_sm' | 'move_image_sm_back' | 'move_image_back_reset' | 'rotate_image';
+const actionTypeStrings = ['set_image',  'clear_image', 'none', 'print', 'print_event', 'move_image_sm', 'move_image_lg_back', 'move_image_back_reset', 'rotate_image'] ;
+const record_arr = ["./images/Untitled.png",
+    "./images/Untitled(1).png",
+    "./images/Untitled(2).png",
+    "./images/Untitled(3).png",
+    "./images/Untitled(4).png",
+    "./images/Untitled(5).png",
+    "./images/Untitled(6).png",
+    "./images/Untitled(7).png",
+    "./images/Untitled(8).png",
+    "./images/Untitled(9).png",
+    "./images/Untitled(10).png",
+    "./images/Untitled(11).png",
+    "./images/Untitled(12).png",
+    "./images/Untitled(13).png",
+    "./images/Untitled(14).png",
+    "./images/Untitled(15).png",
+    "./images/Untitled(16).png",
+    "./images/Untitled(17).png",
+    "./images/Untitled(18).png",
+    "./images/Untitled(19).png"
+]
 
 // The type we are expecting to get back from decoding json for an Action
 export type Action_json = {act: ActionType, region: string, param: string};
@@ -73,14 +94,15 @@ export class Action {
     // The parameter string for the action (can be "")
     protected _param : string;
     public get param() {return this._param;}
-
+    
     //-------------------------------------------------------------------
     // Methods
     //-------------------------------------------------------------------
+    
 
     // Carry out the action represented by this object.  evtType and evtReg describe
     // the event which is causing the action (for use by print_event actions).
-    public execute(evtType : EventType, evtReg? : Region) { 
+    public async execute(evtType : EventType, evtReg? : Region) { 
         if (this._actType === 'none') return;
         // **** YOUR CODE HERE ****
         switch(this._actType){
@@ -97,16 +119,49 @@ export class Action {
                 break;
             case "print":
                 console.log("evt---\n",">",evtType.toString(),"(",this.param,")")
-                //console.log("Execute Action: print (param_val) | \n")
-                //console.log("parm | ", this._param);
                 break;
             case "print_event":
                 console.log("evt---\n",">",evtType.toString(),"(",evtReg?.name,")")
                 break;
+            case "move_image_sm":
+                //Move Tone Arm Position
+                if (this.onRegion) {
+                    this.onRegion.x = this.onRegion.x - 55;
+                    this.onRegion.y = this.onRegion.y - 10;
+                    this.onRegion.damage()
+                }
+                break;
+            case "move_image_back_reset":
+                //Reset Tone Arm Position
+                if (this.onRegion) {
+                    this.onRegion.x = 320;
+                    this.onRegion.y = 0;
+                    this.onRegion.damage()
+                }
+                break;
+            case "rotate_image": 
+                //Rotate Record 
+                let ctx    = this.onRegion?.parent?.parent?.parent?.canvasContext;
+                this.onRegion?.parent?.parent?.x
+                
+                for(let i:number=0;i<=19;i+=1){
+                    setTimeout(() => {
+                        if(ctx && this.onRegion) {
+                            ctx.save();
+                            this.onRegion.imageLoc = record_arr[i];
+                            this.onRegion.damage()
+                            ctx.restore();
+                        } 
+                    }, 200*i, i);
+                }
+                break;
             }
     }
 
-     //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    private delay(ms: number) {
+        return new Promise( resolve => setTimeout(resolve, ms) );
+    }
+    //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     
     // Attempt to find the name listed for this region in the given list of regions
     // (from the whole FSM), assiging the Region object to this._onRegion if found.

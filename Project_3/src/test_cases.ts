@@ -27,7 +27,8 @@ export function runTests() {
 
 	test1();
 	test2();
-	test3();
+	//test3();
+	test4();
 
 	console.log("Test is set up...");
 }
@@ -73,6 +74,13 @@ function test3() {
 	let fsmInt = new FSMInteractor(undefined, 400,0);
 	root.addChild(fsmInt);
 	fsmInt.startLoadFromJson("./fsm_json/stick.json");
+}
+
+//Custom Interactor Representing a Vinyl Player
+function test4() {
+	let fsmInt = new FSMInteractor(undefined, 500, 200)
+	root.addChild(fsmInt);
+	fsmInt.startLoadFromJson("./fsm_json/vinyl.json")
 }
 
 //-------------------------------------------------------------------

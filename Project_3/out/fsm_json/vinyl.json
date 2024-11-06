@@ -1,0 +1,146 @@
+{
+    "regions": [
+        { "name": "toneArm_img", "x": 320, "y": 0, "imageLoc": "./images/toneArm.png"},
+        { "name": "record_img", "x": 10, "y": 0, "w":300,"h":300,"imageLoc": "./images/record.png"},
+
+        { "name": "toneArmHead_n", "x": 320, "y": 180, "w":50, "h":35},
+        { "name": "recordPlayer", "x": 0, "y": 0, "w":475, "h":350},
+        { "name": "startButton", "x": 380, "y":250, "w":50, "h":50, "imageLoc": "./images/start_image.png"},
+        { "name": "toneArmHead_g1", "x": 250, "y": 185, "w":50, "h":35},
+        { "name": "toneArmHead_g2", "x": 220, "y": 150, "w":50, "h":35}
+    ], 
+    "states":[
+        { "name" : "inactiveGroove_n",
+          "transitions" : [
+                { "onEvent" : {"evtType" : "press", "region" : "toneArmHead_n"},
+                  "target" : "activeGroove_n",
+                  "actions": [{"act": "print", "param": "== Pressed Tone Arm At Rest Region =="}]
+                }  
+            ]
+        },
+
+        { "name" : "activeGroove_n",
+          "transitions" : [
+              { "onEvent": {"evtType": "release", "region": "toneArmHead_n"},
+              "target": "inactiveGroove_n", 
+              "actions": [{"act": "print", "param": "== Tone Arm At Rest Region =="}]
+              },
+
+              { "onEvent": {"evtType": "release_none", "region": "toneArmHead_n"},
+              "target": "inactiveGroove_n",
+              "actions": [{"act": "print", "param": "== Tone Arm At Rest Region =="}]
+              },
+
+              { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_g1"},
+                "target": "activeGroove_1",
+                "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove1.png"},
+                      {"act": "move_image_sm", "region": "toneArm_img", "param": ""}
+                ]
+              },
+
+              { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_g2"},
+                "target": "activeGroove_2",
+                "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove2.png"},
+                      {"act": "move_image_sm", "region": "toneArm_img", "param": ""}
+                ]
+              }
+            ]
+        },
+
+        { "name" : "inactiveGroove_1",
+        "transitions" : [
+              { "onEvent" : {"evtType" : "press", "region" : "toneArmHead_g1"},
+                "target" : "activeGroove_1"
+              },
+              { "onEvent" : {"evtType" : "press", "region" : "startButton"},
+                  "target" : "inactiveGroove_1",
+                  "actions": [
+                    {"act": "print", "param": "== Started Record =="},
+                    {"act": "clear_image", "region": "toneArm_img"},
+                    {"act": "clear_image", "region": "recordPlayer"},
+                    {"act": "rotate_image", "region": "recordPlayer", "param": "./images/Untitled(5).png"},
+                    {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove1.png"}
+                  ]
+              }
+          ]
+        },
+
+        { "name" : "activeGroove_1",
+          "transitions" : [
+              { "onEvent": {"evtType": "release", "region": "toneArmHead_g1"},
+              "target": "inactiveGroove_1", 
+              "actions": [{"act": "print", "param": "== Released Tone Arm At Groove 1 Region =="}]
+              },
+
+              { "onEvent": {"evtType": "release_none", "region": "toneArmHead_n"},
+              "target": "inactiveGroove_1",
+              "actions": [{"act": "print", "param": "== Released Tone Arm At Groove 1 Region =="}]
+              },
+
+              { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_g2"},
+                "target": "activeGroove_2",
+                "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove2.png"},
+                      {"act": "move_image_back_reset", "region": "toneArm_img", "param": ""},
+                      {"act": "move_image_sm", "region": "toneArm_img", "param": ""}
+                ]
+              },
+
+              { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_n"},
+                "target": "activeGroove_n",
+                "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm.png"},
+                      {"act": "move_image_back_reset", "region": "toneArm_img", "param": ""}
+                ]
+              }
+            ]
+        },
+
+        { "name" : "inactiveGroove_2",
+        "transitions" : [
+              { "onEvent" : {"evtType" : "press", "region" : "toneArmHead_g2"},
+                "target" : "activeGroove_2"
+              }
+          ]
+        },
+
+        { "name" : "activeGroove_2",
+          "transitions" : [
+                { "onEvent": {"evtType": "release", "region": "toneArmHead_g2"},
+                "target": "inactiveGroove_2",
+                "actions": [{"act": "print", "param": "== Released Tone Arm at Groove 2 =="}]
+                },
+
+                { "onEvent": {"evtType": "release_none", "region": "toneArmHead_g2"},
+                "target": "inactiveGroove_2",
+                "actions": [{"act": "print", "param": "== Released Tone Arm at Groove 2 =="}]
+                },
+
+                { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_n"},
+                  "target": "activeGroove_n",
+                  "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm.png"},
+                      {"act": "move_image_back_reset", "region": "toneArm_img", "param": ""}
+                  ]
+                },
+
+                { "onEvent": {"evtType": "move_inside", "region": "toneArmHead_g1"},
+                  "target": "activeGroove_1",
+                  "actions": [
+                      {"act": "clear_image", "region": "toneArm_img"},
+                      {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove1.png"},
+                      {"act": "move_image_back_reset", "region": "toneArm_img", "param": ""},
+                      {"act": "move_image_sm", "region": "toneArm_img", "param": ""}
+                  ]
+                }
+            ]
+        }
+    ]
+}
