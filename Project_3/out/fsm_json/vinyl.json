@@ -62,7 +62,7 @@
                     {"act": "print", "param": "== Started Record =="},
                     {"act": "clear_image", "region": "toneArm_img"},
                     {"act": "clear_image", "region": "recordPlayer"},
-                    {"act": "rotate_image", "region": "recordPlayer", "param": "./images/Untitled(5).png"},
+                    {"act": "rotate_image", "region": "recordPlayer", "param": ""},
                     {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove1.png"}
                   ]
               }
@@ -106,6 +106,16 @@
         "transitions" : [
               { "onEvent" : {"evtType" : "press", "region" : "toneArmHead_g2"},
                 "target" : "activeGroove_2"
+              },
+              { "onEvent" : {"evtType" : "press", "region" : "startButton"},
+                  "target" : "inactiveGroove_2",
+                  "actions": [
+                    {"act": "print", "param": "== Started Record =="},
+                    {"act": "clear_image", "region": "toneArm_img"},
+                    {"act": "clear_image", "region": "recordPlayer"},
+                    {"act": "rotate_image", "region": "recordPlayer", "param": ""},
+                    {"act": "set_image", "region": "toneArm_img", "param": "./images/toneArm_activeGrove2.png"}
+                  ]
               }
           ]
         },

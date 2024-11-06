@@ -27,8 +27,8 @@ export function runTests() {
 
 	test1();
 	test2();
-	//test3();
-	test4();
+	test3();
+	//test4();
 
 	console.log("Test is set up...");
 }
